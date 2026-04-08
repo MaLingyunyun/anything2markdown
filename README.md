@@ -76,6 +76,9 @@ anything2markdown/
 
 默认使用 `docling` 环境；你可以命令行传参：`launch.bat 你的环境名`。  
 `launch.bat` 现在会转到 `launch.ps1` 执行（PowerShell），再由 PowerShell 内部调用 `conda run -n ... python main.py`，并自动探测常见 conda 路径与环境名。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。  
+新版 `launch.bat` 已改为 `conda run -n ... python main.py`，并自动探测常见 `conda.bat` 路径，避免双击时 `conda activate` 失效导致闪退。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。
 
 ### 方式 B：命令行
 
@@ -142,3 +145,7 @@ pip install -r requirements.txt
 - `...\\anaconda3\\Scripts`
 - `...\\miniconda3\\condabin`
 - `...\\miniconda3\\Scripts`
+1. 打开 `launch.bat`，确认 `CONDA_ENV_NAME` 和你的环境名一致。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
+4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
