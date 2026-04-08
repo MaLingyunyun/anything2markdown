@@ -76,6 +76,7 @@ anything2markdown/
 
 先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。  
 新版 `launch.bat` 已改为 `conda run -n ... python main.py`，并自动探测常见 `conda.bat` 路径，避免双击时 `conda activate` 失效导致闪退。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。
 
 ### 方式 B：命令行
 

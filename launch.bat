@@ -31,6 +31,18 @@ if not defined CONDA_BAT if exist "C:\ProgramData\miniconda3\condabin\conda.bat"
 if not defined CONDA_BAT (
     echo [ERROR] 未找到 conda.bat。请检查 Anaconda/Miniconda 是否安装，或把 condabin 加入 PATH。
     echo [TIP] 例如：C:\Users\你的用户名\anaconda3\condabin
+setlocal
+
+REM 修改为你的 conda 环境名
+set CONDA_ENV_NAME=docling
+
+REM 进入当前 bat 所在目录
+cd /d %~dp0
+
+REM 初始化 conda 命令
+call conda activate %CONDA_ENV_NAME%
+if errorlevel 1 (
+    echo [ERROR] conda activate failed. 请检查环境名: %CONDA_ENV_NAME%
     pause
     exit /b 1
 )
@@ -43,6 +55,9 @@ if errorlevel 1 (
     echo.
     echo [ERROR] 启动失败。
     echo [TIP] 先在命令行测试：conda run -n %CONDA_ENV_NAME% python main.py
+python main.py
+if errorlevel 1 (
+    echo [ERROR] 程序运行失败，请查看报错日志。
     pause
     exit /b 1
 )
