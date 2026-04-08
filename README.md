@@ -75,8 +75,10 @@ anything2markdown/
 ### 方式 A（推荐）：双击 `launch.bat`
 
 默认使用 `docling` 环境；你可以命令行传参：`launch.bat 你的环境名`。  
-`launch.bat` 现在直接执行：`conda activate <env> && python main.py`。  
-你已经把 conda 配好了，这种方式最直观、最好维护。
+`launch.bat` 现在会转到 `launch.ps1` 执行（PowerShell），再由 PowerShell 内部调用 `conda run -n ... python main.py`，并自动探测常见 conda 路径与环境名。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。  
+新版 `launch.bat` 已改为 `conda run -n ... python main.py`，并自动探测常见 `conda.bat` 路径，避免双击时 `conda activate` 失效导致闪退。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。
 
 ### 方式 B：命令行
 
@@ -107,25 +109,14 @@ pip install -r requirements.txt
 
 ## 9. 打包建议（第二阶段）
 
-可以直接打包成 exe（推荐先 `onedir` 方案）。  
-我已经提供 `build_exe.bat`，会自动：
-1. 激活 conda 环境  
-2. 安装/升级 pyinstaller  
-3. 执行 `pyinstaller --onedir --windowed --name Anything2Markdown main.py`
+不建议一开始就追求“完全独立 exe”，原因：
+- `docling` 依赖链较大，PyInstaller 首次打包成本高。
+- ASR/OCR 组件在不同机器兼容性差异明显。
 
-使用方式：
-```bash
-build_exe.bat
-# 或指定环境
-build_exe.bat docling
-```
-
-产物目录：
-- `dist/Anything2Markdown/Anything2Markdown.exe`
-
-说明：
-- `onedir` 比 `onefile` 更稳（尤其是 docling 这类依赖较重场景）。
-- 若你后续确认稳定，再尝试 onefile。
+建议顺序：
+1. **先用 conda 环境 + launch.bat 稳定跑通（本仓库已完成）。**
+2. 再尝试 `pyinstaller --onedir main.py`（优先 `onedir`，别先用 `onefile`）。
+3. 针对缺失动态库逐步加 `--hidden-import` / `--collect-all`。
 
 ## 10. MVP 限制 / TODO
 
@@ -136,14 +127,25 @@ build_exe.bat docling
 ## 11. 常见问题：双击 launch.bat 闪退
 
 如果仍闪退，请按顺序检查：
-1. 打开 `launch.bat`，确认环境名（默认 `docling`）与你本机一致，或命令行执行 `launch.bat your_env`。  
-2. 在终端手工执行：`conda activate 你的环境名 && python main.py`，确认环境可正常运行。  
-3. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
+1. 打开 `launch.bat`，确认 `DEFAULT_CONDA_ENV_NAME` 和你的环境名一致（或命令行执行 `launch.bat your_env`）。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
+4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
 
-## 12. 常见问题：CMD 中 conda 不可用
+## 12. 常见问题：PowerShell 可以用 conda，但 CMD 提示“不是内部或外部命令”
 
-你当前已修复此问题。若后续再次出现，请先执行：
-```bash
-conda init cmd.exe
-```
-然后重新打开 CMD。
+这是 Windows 上很常见的 PATH 差异问题。现在 `launch.bat -> launch.ps1`，并在 PowerShell 中自动探测：
+- `conda.bat`（`condabin`）
+- `conda.exe`（`Scripts`）
+- 用户目录和 `C:\\ProgramData` 下的常见 Anaconda/Miniconda 安装路径
+
+因此即使 CMD 里直接输入 `conda` 失败，双击 `launch.bat` 仍可能正常启动。  
+若依旧失败，请把以下目录之一加入系统 PATH 后重试：
+- `...\\anaconda3\\condabin`
+- `...\\anaconda3\\Scripts`
+- `...\\miniconda3\\condabin`
+- `...\\miniconda3\\Scripts`
+1. 打开 `launch.bat`，确认 `CONDA_ENV_NAME` 和你的环境名一致。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
+4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
