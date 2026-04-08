@@ -74,6 +74,8 @@ anything2markdown/
 
 ### 方式 A（推荐）：双击 `launch.bat`
 
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。  
+新版 `launch.bat` 已改为 `conda run -n ... python main.py`，并自动探测常见 `conda.bat` 路径，避免双击时 `conda activate` 失效导致闪退。
 先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。
 
 ### 方式 B：命令行
@@ -119,3 +121,11 @@ pip install -r requirements.txt
 - GUI 当前不做任务暂停/恢复（MVP刻意简化）。
 - 大文件批处理时，日志较多是预期行为。
 - 如果你希望后续加“每个文件耗时统计、失败重试、导出报告 CSV”，可以在现结构上直接扩展。
+
+## 11. 常见问题：双击 launch.bat 闪退
+
+如果仍闪退，请按顺序检查：
+1. 打开 `launch.bat`，确认 `CONDA_ENV_NAME` 和你的环境名一致。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
+4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
