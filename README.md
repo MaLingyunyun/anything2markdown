@@ -75,7 +75,10 @@ anything2markdown/
 ### 方式 A（推荐）：双击 `launch.bat`
 
 默认使用 `docling` 环境；你可以命令行传参：`launch.bat 你的环境名`。  
-`launch.bat` 现在会先拉起一个 `cmd /k` 常驻窗口，然后优先**直接查找 conda 环境里的 `python.exe`**并启动 `main.py`（不依赖 `conda` 命令是否可用）；找不到时才 fallback 到 `launch.ps1` 的 `conda run`。这样双击时不会一闪而过，且在 CMD 没有 conda 命令时仍可启动。
+`launch.bat` 现在会转到 `launch.ps1` 执行（PowerShell），再由 PowerShell 内部调用 `conda run -n ... python main.py`，并自动探测常见 conda 路径与环境名。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。  
+新版 `launch.bat` 已改为 `conda run -n ... python main.py`，并自动探测常见 `conda.bat` 路径，避免双击时 `conda activate` 失效导致闪退。
+先把 `launch.bat` 里的 `CONDA_ENV_NAME` 改成你的环境名（默认 `docling`）。
 
 ### 方式 B：命令行
 
@@ -124,20 +127,25 @@ pip install -r requirements.txt
 ## 11. 常见问题：双击 launch.bat 闪退
 
 如果仍闪退，请按顺序检查：
-1. 打开 `launch.bat`，确认 `ENV_NAME` 默认值（`docling`）与你环境一致，或命令行执行 `launch.bat your_env`。  
-2. 若启动器提示找不到 `python.exe`，可在 `launch.bat` 里手工设置 `PYTHON_EXE=你的环境python.exe`。  
-3. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+1. 打开 `launch.bat`，确认 `DEFAULT_CONDA_ENV_NAME` 和你的环境名一致（或命令行执行 `launch.bat your_env`）。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
 4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
 
 ## 12. 常见问题：PowerShell 可以用 conda，但 CMD 提示“不是内部或外部命令”
 
-这是 Windows 上很常见的 PATH 差异问题。现在 `launch.bat` 会先探测环境里的 `python.exe`：
-- `%USERPROFILE%\\anaconda3\\envs\\<env>\\python.exe`
-- `%USERPROFILE%\\miniconda3\\envs\\<env>\\python.exe`
-- `C:\\ProgramData\\anaconda3\\envs\\<env>\\python.exe`
-- `C:\\ProgramData\\miniconda3\\envs\\<env>\\python.exe`
-
-找不到才会走 `launch.ps1`（PowerShell + conda run）。
+这是 Windows 上很常见的 PATH 差异问题。现在 `launch.bat -> launch.ps1`，并在 PowerShell 中自动探测：
+- `conda.bat`（`condabin`）
+- `conda.exe`（`Scripts`）
+- 用户目录和 `C:\\ProgramData` 下的常见 Anaconda/Miniconda 安装路径
 
 因此即使 CMD 里直接输入 `conda` 失败，双击 `launch.bat` 仍可能正常启动。  
-若依旧失败，建议在 `launch.bat` 里直接手工设置 `PYTHON_EXE=你的docling环境python.exe`。
+若依旧失败，请把以下目录之一加入系统 PATH 后重试：
+- `...\\anaconda3\\condabin`
+- `...\\anaconda3\\Scripts`
+- `...\\miniconda3\\condabin`
+- `...\\miniconda3\\Scripts`
+1. 打开 `launch.bat`，确认 `CONDA_ENV_NAME` 和你的环境名一致。  
+2. 在终端执行：`conda run -n 你的环境名 python main.py`，看是否有明确报错。  
+3. 若提示找不到 `conda.bat`，把 `anaconda3\\condabin` 或 `miniconda3\\condabin` 加到系统 PATH。  
+4. 若 GUI 打开失败，检查当前环境是否安装 `tkinterdnd2`（拖拽可选，不影响按钮选择方式）。
